@@ -1,7 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../database/db.js";
 
-
 export const User = sequelize.define(
   "User",
   {
@@ -10,24 +9,16 @@ export const User = sequelize.define(
       autoIncrement: true,
       primaryKey: true
     },
-
     customerName: {
       type: DataTypes.STRING,
       allowNull: false
     },
-
     customerEmail: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true
     },
-
-    customerPhone: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-
-    customerAddress: {
+    password: {
       type: DataTypes.STRING,
       allowNull: false
     }

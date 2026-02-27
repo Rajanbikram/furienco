@@ -1,11 +1,9 @@
 import express from "express";
-// ✅ Correct - named import
-import { getAll, save } from '../Controller/authController.js'
-
-
+import { register, login, getAll } from '../Controller/authController.js';
 const router = express.Router();
 
-router.get("/", getAll);
-router.post("/", save);
+router.post("/register", register);
+router.post("/login", login);
+router.get("/users", getAll);
 
 export default router;

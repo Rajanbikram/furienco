@@ -1,137 +1,95 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, signupSchema } from './schema/authSchema';
-import '../../css/auth.css';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../utils/axios";
+ // Assuming you have a CSS file for styling
 
-const Login = () => {
-  const [isActive, setIsActive] = useState(false);
+export default function Login() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const {
-    register: registerSignup,
-    handleSubmit: handleSubmitSignup,
-    formState: { errors: errorsSignup },
-  } = useForm({
-    resolver: zodResolver(signupSchema),
-  });
-
-  const {
-    register: registerLogin,
-    handleSubmit: handleSubmitLogin,
-    formState: { errors: errorsLogin },
-  } = useForm({
-    resolver: zodResolver(loginSchema),
-  });
-
-  const onSignup = (data) => {
-    console.log('Signup Data:', data);
-    // API call here
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const onLogin = (data) => {
-    console.log('Login Data:', data);
-    // API call here
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await loginUser({ email: formData.email, password: formData.password });
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.data));
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="auth-page">
-      <div className={`container ${isActive ? 'active' : ''}`} id="container">
-        {/* Sign Up Form */}
-        <div className="form-container sign-up">
-          <form onSubmit={handleSubmitSignup(onSignup)}>
-            <h1>Create Account</h1>
-            <span>Use your email for registration</span>
-            
-            <input
-              type="text"
-              placeholder="Name"
-              {...registerSignup('name')}
-            />
-            {errorsSignup.name && (
-              <span className="error">{errorsSignup.name.message}</span>
-            )}
+    <div className="auth-wrapper">
 
-            <input
-              type="email"
-              placeholder="Email"
-              {...registerSignup('email')}
-            />
-            {errorsSignup.email && (
-              <span className="error">{errorsSignup.email.message}</span>
-            )}
-
-            <input
-              type="password"
-              placeholder="Password"
-              {...registerSignup('password')}
-            />
-            {errorsSignup.password && (
-              <span className="error">{errorsSignup.password.message}</span>
-            )}
-
-            <button type="submit">Sign Up</button>
-          </form>
+      {/* Left Blue Panel */}
+      <div className="auth-left">
+        <div className="auth-logo-box">
+          <span className="auth-logo-text">
+            Furlenco<span className="auth-logo-icon">⟳</span>
+          </span>
         </div>
+        <h2 className="auth-brand-name">Furlenco</h2>
+        <p className="auth-brand-tagline">Live Fully, Rent Smartly</p>
+      </div>
 
-        {/* Sign In Form */}
-        <div className="form-container sign-in">
-          <form onSubmit={handleSubmitLogin(onLogin)}>
-            <h1>Sign In</h1>
-            <span>Use your email and password</span>
+      {/* Right White Panel */}
+      <div className="auth-right">
+        <div className="auth-form-container">
+          <h2 className="auth-title">Welcome Back</h2>
+          <p className="auth-subtitle">Sign in to continue</p>
 
-            <input
-              type="email"
-              placeholder="Email"
-              {...registerLogin('email')}
-            />
-            {errorsLogin.email && (
-              <span className="error">{errorsLogin.email.message}</span>
-            )}
+          {error && <div className="error-box">{error}</div>}
 
-            <input
-              type="password"
-              placeholder="Password"
-              {...registerLogin('password')}
-            />
-            {errorsLogin.password && (
-              <span className="error">{errorsLogin.password.message}</span>
-            )}
+          <form onSubmit={handleSubmit}>
+            <div className="form-row">
+              <span className="form-label">Email ID</span>
+              <input
+                type="email" name="email" value={formData.email}
+                onChange={handleChange} required
+                className="form-input"
+              />
+            </div>
 
-            <a href="#">Forget Your Password?</a>
-            <button type="submit">Sign In</button>
+            <div className="form-row">
+              <span className="form-label">Password</span>
+              <input
+                type="password" name="password" value={formData.password}
+                onChange={handleChange} required
+                className="form-input"
+              />
+            </div>
+
+            <div className="form-options">
+              <label className="form-remember">
+                <input type="checkbox" /> Remember Me?
+              </label>
+              <a href="#" className="form-forgot">Forgot Password?</a>
+            </div>
+
+            <button type="submit" disabled={loading} className="btn-login">
+              {loading ? "Logging in..." : "Login"}
+            </button>
           </form>
-        </div>
 
-        {/* Toggle Container */}
-        <div className="toggle-container">
-          <div className="toggle">
-            <div className="toggle-panel toggle-left">
-              <h1>Welcome Back!</h1>
-              <p>Enter your personal details to use all of site features</p>
-              <button
-                className="hidden"
-                type="button"
-                onClick={() => setIsActive(false)}
-              >
-                Sign In
-              </button>
-            </div>
-            <div className="toggle-panel toggle-right">
-              <h1>Hello, Friend!</h1>
-              <p>Register with your personal details to use all of site features</p>
-              <button
-                className="hidden"
-                type="button"
-                onClick={() => setIsActive(true)}
-              >
-                Sign Up
-              </button>
-            </div>
-          </div>
+          <p className="auth-bottom-text">
+            Don't have an account?{" "}
+            <span className="auth-link" onClick={() => navigate("/register")}>
+              Sign Up
+            </span>
+          </p>
         </div>
       </div>
     </div>
   );
-};
-
-export default Login;
+}

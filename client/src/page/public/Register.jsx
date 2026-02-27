@@ -1,91 +1,101 @@
-import { Link } from "react-router-dom";
-import "../../css/auth.css";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { RegisterSchema } from "./schema/register.schema";
-import { useApi } from "../../hooks/useAPi";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { registerUser } from "../../utils/axios";
 
-const Register = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(RegisterSchema),
+export default function Register() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
   });
-  const { callApi } = useApi();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  console.log(errors);
-  const handleRegister = async (userData) => {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match!");
+      return;
+    }
+    setLoading(true);
     try {
-      const res = await callApi("POST", "/users", { data: userData });
-      console.log(res);
+      const data = {
+        customerName: formData.fullName,
+        customerEmail: formData.email,
+        customerPhone: "N/A",
+        customerAddress: "N/A",
+        password: formData.password
+      };
+      await registerUser(data);
+      navigate("/login");
     } catch (err) {
-      console.log(err.message);
+      setError(err.response?.data?.message || "Registration failed!");
+    } finally {
+      setLoading(false);
     }
   };
+
+  const fields = [
+    { label: "Full Name", name: "fullName", type: "text" },
+    { label: "Email ID", name: "email", type: "email" },
+    { label: "Password", name: "password", type: "password" },
+    { label: "Confirm Password", name: "confirmPassword", type: "password" },
+  ];
+
   return (
-    <>
-      <div className="container-fluid flex flex-column p-3">
-        <div class="register-card">
-          <h2>Create Account</h2>
-          <p class="subtitle">Please fill in the details below</p>
+    <div className="auth-wrapper">
 
-          <form onSubmit={handleSubmit(handleRegister)}>
-            <div class="form-group">
-              <label>Full Name</label>
-              <input
-                {...register("name")}
-                type="text"
-                placeholder="Full Name"
-              />
-              {errors.name && <p>{errors.name.message}</p>}
-            </div>
+      {/* Left Blue Panel */}
+      <div className="auth-left">
+        <div className="auth-logo-box">
+          <span className="auth-logo-text">
+            Furlenco<span className="auth-logo-icon">⟳</span>
+          </span>
+        </div>
+        <h2 className="auth-brand-name">Furlenco</h2>
+        <p className="auth-brand-tagline">Live Fully, Rent Smartly</p>
+      </div>
 
-            <div class="form-group">
-              <label>Email Address</label>
-              <input
-                {...register("email")}
-                type="email"
-                placeholder="Enter Email"
-              />
-              {errors.email && <p>{errors.email.message}</p>}
-            </div>
+      {/* Right White Panel */}
+      <div className="auth-right">
+        <div className="auth-form-container">
+          <h2 className="auth-title">Create an Account</h2>
+          <p className="auth-subtitle">Sign Up</p>
 
-            <div class="form-group">
-              <label>Password</label>
-              <input
-                {...register("password")}
-                type="password"
-                placeholder="Enter Password"
-              />
-              {errors.password && <p>{errors.password.message}</p>}
-            </div>
+          {error && <div className="error-box">{error}</div>}
 
-            <div class="form-group">
-              <label>Confirm Password</label>
-              <input
-                {...register("confirmPassword")}
-                type="password"
-                placeholder="Confirm Password"
-              />
-              {errors.confirmPassword && (
-                <p>{errors.confirmPassword.message}</p>
-              )}
-            </div>
+          <form onSubmit={handleSubmit}>
+            {fields.map(({ label, name, type }) => (
+              <div className="form-row" key={name}>
+                <span className="form-label">{label}</span>
+                <input
+                  type={type} name={name} value={formData[name]}
+                  onChange={handleChange} required
+                  className="form-input"
+                />
+              </div>
+            ))}
 
-            <button type="submit" class="btn">
-              Register
+            <button type="submit" disabled={loading} className="btn-register">
+              {loading ? "Registering..." : "Register"}
             </button>
-
-            <p class="login-text">
-              Already have an account?
-              <Link to="/login"> Login</Link>
-            </p>
           </form>
+
+          <p className="auth-bottom-text">
+            Already have an account?{" "}
+            <span className="auth-link" onClick={() => navigate("/login")}>
+              Sign in
+            </span>
+          </p>
         </div>
       </div>
-    </>
+    </div>
   );
-};
-export default Register;
+}
