@@ -8,7 +8,8 @@ export default function Register() {
     fullName: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    role: "renter"
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,7 +32,8 @@ export default function Register() {
         customerEmail: formData.email,
         customerPhone: "N/A",
         customerAddress: "N/A",
-        password: formData.password
+        password: formData.password,
+        role: formData.role       // role pathauне
       };
       await registerUser(data);
       navigate("/login");
@@ -51,7 +53,6 @@ export default function Register() {
 
   return (
     <div className="auth-wrapper">
-
       {/* Left Blue Panel */}
       <div className="auth-left">
         <div className="auth-logo-box">
@@ -82,6 +83,20 @@ export default function Register() {
                 />
               </div>
             ))}
+
+            {/* Role Select */}
+            <div className="form-row">
+              <span className="form-label">Register As</span>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="form-input"
+              >
+                <option value="renter">Renter</option>
+                <option value="seller">Seller</option>
+              </select>
+            </div>
 
             <button type="submit" disabled={loading} className="btn-register">
               {loading ? "Registering..." : "Register"}

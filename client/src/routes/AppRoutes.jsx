@@ -8,6 +8,7 @@ import MyListings from "../page/private/seller/MyListings";
 import Orders from "../page/private/seller/Orders";
 import Customers from "../page/private/seller/Customers";
 import Profile from "../page/private/seller/Profile";
+import RenterDashboard from "../page/private/renter/RenterDashboard";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -22,13 +23,12 @@ export default function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Protected Routes */}
+      {/* Seller Protected Routes */}
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <Dashboard />
         </ProtectedRoute>
       }>
-        {/* Nested Routes — Dashboard layout  */}
         <Route index element={<div>Welcome to Dashboard</div>} />
         <Route path="add-listing" element={<AddListing />} />
         <Route path="my-listings" element={<MyListings />} />
@@ -37,7 +37,21 @@ export default function AppRoutes() {
         <Route path="profile" element={<Profile />} />
       </Route>
 
-     <Route path="*" element={<Navigate to="/" />} />
+      {/* Renter Protected Routes */}
+      <Route path="/renter-dashboard" element={
+        <ProtectedRoute>
+          <RenterDashboard />
+        </ProtectedRoute>
+      }>
+        <Route index element={null} />
+        <Route path="browse" element={null} />
+        <Route path="my-rentals" element={null} />
+        <Route path="cart" element={null} />
+        <Route path="history" element={null} />
+        <Route path="settings" element={null} />
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }

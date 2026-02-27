@@ -21,6 +21,11 @@ export const User = sequelize.define(
     password: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    role: {
+      type: DataTypes.ENUM("seller", "renter"),
+      allowNull: false,
+      defaultValue: "renter"
     }
   },
   {

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../utils/axios";
- // Assuming you have a CSS file for styling
 
 export default function Login() {
   const navigate = useNavigate();
@@ -21,7 +20,14 @@ export default function Login() {
       const res = await loginUser({ email: formData.email, password: formData.password });
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.data));
-      navigate("/dashboard");
+
+      // Role hेरेर redirect गर्ने
+      const role = res.data.data.role;
+      if (role === "seller") {
+        navigate("/dashboard");
+      } else {
+        navigate("/renter-dashboard");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed!");
     } finally {
@@ -31,7 +37,6 @@ export default function Login() {
 
   return (
     <div className="auth-wrapper">
-
       {/* Left Blue Panel */}
       <div className="auth-left">
         <div className="auth-logo-box">
@@ -60,7 +65,6 @@ export default function Login() {
                 className="form-input"
               />
             </div>
-
             <div className="form-row">
               <span className="form-label">Password</span>
               <input
@@ -69,14 +73,12 @@ export default function Login() {
                 className="form-input"
               />
             </div>
-
             <div className="form-options">
               <label className="form-remember">
                 <input type="checkbox" /> Remember Me?
               </label>
               <a href="#" className="form-forgot">Forgot Password?</a>
             </div>
-
             <button type="submit" disabled={loading} className="btn-login">
               {loading ? "Logging in..." : "Login"}
             </button>

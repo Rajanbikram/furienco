@@ -6,16 +6,23 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import { connection } from "./database/db.js";
 
+// ── Model imports — must be before connection() so sync() creates all tables ──
+import "./Model/seller/listingModel.js";
+import "./Model/seller/orderModel.js";
+import "./Model/seller/customerModel.js";
+import "./Model/renter/rentalModel.js";
+import "./Model/renter/rentalHistoryModel.js";
+
 // Auth Routes
 import authRoute from "./Routes/authRoute.js";
-
 // Seller Routes
 import listingRoute from "./Routes/seller/listingRoute.js";
 import orderRoute from "./Routes/seller/orderRoute.js";
 import customerRoute from "./Routes/seller/customerRoute.js";
+// Renter Routes
+import renterRoutes from "./Routes/renter/renterRoutes.js";
 
 dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -42,6 +49,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/seller/listings", listingRoute);
 app.use("/api/seller/orders", orderRoute);
 app.use("/api/seller/customers", customerRoute);
+app.use("/api/renter", renterRoutes);
 
 // Error Handling
 app.use((err, req, res, next) => {

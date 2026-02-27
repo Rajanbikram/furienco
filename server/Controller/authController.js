@@ -5,9 +5,8 @@ import jwt from "jsonwebtoken";
 // Register
 export const register = async (req, res) => {
   try {
-    const { customerName, customerEmail, password } = req.body;
+    const { customerName, customerEmail, customerPhone, customerAddress, password, role } = req.body;
 
-    // Validate required fields
     if (!customerName || !customerEmail || !password) {
       return res.status(400).json({
         success: false,
@@ -15,7 +14,6 @@ export const register = async (req, res) => {
       });
     }
 
-    // Check if email already exists
     const existingUser = await User.findOne({ where: { customerEmail } });
     if (existingUser) {
       return res.status(400).json({
@@ -24,14 +22,13 @@ export const register = async (req, res) => {
       });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
     const user = await User.create({
       customerName,
       customerEmail,
-      password: hashedPassword
+      password: hashedPassword,
+      role: role || "renter"   // role save garne
     });
 
     res.status(201).json({
@@ -40,7 +37,8 @@ export const register = async (req, res) => {
       data: {
         id: user.id,
         customerName: user.customerName,
-        customerEmail: user.customerEmail
+        customerEmail: user.customerEmail,
+        role: user.role
       }
     });
   } catch (error) {
@@ -53,7 +51,6 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate fields
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -61,7 +58,6 @@ export const login = async (req, res) => {
       });
     }
 
-    // Find user
     const user = await User.findOne({ where: { customerEmail: email } });
     if (!user) {
       return res.status(404).json({
@@ -70,7 +66,6 @@ export const login = async (req, res) => {
       });
     }
 
-    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({
@@ -79,9 +74,8 @@ export const login = async (req, res) => {
       });
     }
 
-    // Generate token
     const token = jwt.sign(
-      { id: user.id, email: user.customerEmail },
+      { id: user.id, email: user.customerEmail, role: user.role },
       process.env.JWT_SECRET || "furlenco_secret",
       { expiresIn: "1d" }
     );
@@ -93,7 +87,8 @@ export const login = async (req, res) => {
       data: {
         id: user.id,
         customerName: user.customerName,
-        customerEmail: user.customerEmail
+        customerEmail: user.customerEmail,
+        role: user.role    // role return garne
       }
     });
   } catch (error) {
@@ -105,7 +100,7 @@ export const login = async (req, res) => {
 export const getAll = async (req, res) => {
   try {
     const users = await User.findAll({
-      attributes: { exclude: ["password"] }  // never send password
+      attributes: { exclude: ["password"] }
     });
     res.status(200).json({ success: true, data: users });
   } catch (error) {
