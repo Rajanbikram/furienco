@@ -5,6 +5,7 @@ export const Order = sequelize.define(
   "Order",
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    sellerId: { type: DataTypes.INTEGER, allowNull: true }, // ← NEW
     product: { type: DataTypes.STRING, allowNull: false },
     customer: { type: DataTypes.STRING, allowNull: false },
     period: { type: DataTypes.STRING, allowNull: true },

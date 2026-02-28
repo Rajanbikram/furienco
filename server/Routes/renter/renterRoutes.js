@@ -9,7 +9,7 @@ import {
 
 const router = express.Router();
 
-router.get("/products", verifyToken, getProducts);
+router.get("/products", getProducts);              // ← PUBLIC (no verifyToken)
 router.get("/rentals", verifyToken, getActiveRentals);
 router.get("/history", verifyToken, getRentalHistory);
 router.post("/order", verifyToken, createOrder);

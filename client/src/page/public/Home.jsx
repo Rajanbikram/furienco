@@ -1,20 +1,22 @@
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
 
 export default function Home() {
   const navigate = useNavigate();
 
   return (
     <div style={{ fontFamily: "'Segoe UI', sans-serif", minHeight: "100vh" }}>
+
       {/* Navbar */}
       <nav style={{
         display: "flex", justifyContent: "center", gap: "40px",
         padding: "16px 0", backgroundColor: "#a8c8e8", alignItems: "center"
       }}>
-        {["Furniture", "Trends", "Blog", "About Us"].map(item => (
-          <a key={item} href="#" style={{ textDecoration: "none", color: "#1a1a2e", fontWeight: "500", fontSize: "15px" }}>{item}</a>
-        ))}
+
+        {/* About Us → Browse page */}
+        <button
+          onClick={() => navigate("/browse")}
+          style={{ textDecoration: "none", color: "#1a1a2e", fontWeight: "500", fontSize: "15px", background: "none", border: "none", cursor: "pointer" }}
+        >About Us</button>
         <button
           onClick={() => navigate("/login")}
           style={{ textDecoration: "none", color: "#1a1a2e", fontWeight: "500", fontSize: "15px", background: "none", border: "none", cursor: "pointer" }}
@@ -33,14 +35,25 @@ export default function Home() {
           <p style={{ color: "#2c3e6b", fontSize: "14px", marginBottom: "28px" }}>
             Discover luxurious, high-quality furniture crafted for comfort and style
           </p>
-          <button
-            onClick={() => navigate("/register")}
-            style={{
-              backgroundColor: "#1a1a2e", color: "white", border: "none",
-              padding: "12px 28px", borderRadius: "4px", fontSize: "15px",
-              cursor: "pointer", fontWeight: "600"
-            }}
-          >Get Started</button>
+          <div style={{ display: "flex", gap: 12 }}>
+            <button
+              onClick={() => navigate("/register")}
+              style={{
+                backgroundColor: "#1a1a2e", color: "white", border: "none",
+                padding: "12px 28px", borderRadius: "4px", fontSize: "15px",
+                cursor: "pointer", fontWeight: "600"
+              }}
+            >Get Started</button>
+            <button
+              onClick={() => navigate("/browse")}
+              style={{
+                backgroundColor: "transparent", color: "#1a1a2e",
+                border: "2px solid #1a1a2e",
+                padding: "12px 28px", borderRadius: "4px", fontSize: "15px",
+                cursor: "pointer", fontWeight: "600"
+              }}
+            >Browse Products</button>
+          </div>
         </div>
         <div>
           <img
@@ -56,6 +69,16 @@ export default function Home() {
         <h2 style={{ textAlign: "center", fontSize: "22px", fontWeight: "700", marginBottom: "30px", color: "#1a1a2e" }}>
           Best Choose our Furniture
         </h2>
+        <div style={{ textAlign: "center" }}>
+          <button
+            onClick={() => navigate("/browse")}
+            style={{
+              backgroundColor: "#3b82f6", color: "white", border: "none",
+              padding: "12px 32px", borderRadius: "6px", fontSize: "15px",
+              cursor: "pointer", fontWeight: "600"
+            }}
+          >View All Products →</button>
+        </div>
       </div>
 
       {/* Footer */}
@@ -85,4 +108,3 @@ export default function Home() {
     </div>
   );
 }
-

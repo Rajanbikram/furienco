@@ -3,10 +3,8 @@ import { Rental } from "../../Model/renter/rentalModel.js";
 import { RentalHistory } from "../../Model/renter/rentalHistoryModel.js";
 import { Order } from "../../Model/seller/orderModel.js";
 import { Customer } from "../../Model/seller/customerModel.js";
-
 import { Op } from "sequelize";
 
-// tenure string -> number of months
 const tenureToMonths = (tenure) => {
   if (!tenure) return 1;
   const t = tenure.toString().toLowerCase().trim();
@@ -18,7 +16,6 @@ const tenureToMonths = (tenure) => {
   return isNaN(parsed) ? 1 : parsed;
 };
 
-// GET all products — seller ko listings table bata
 export const getProducts = async (req, res) => {
   try {
     const { search, category, location } = req.query;
@@ -26,16 +23,13 @@ export const getProducts = async (req, res) => {
     if (category && category !== "All") where.category = category;
     if (location && location !== "All") where.location = location;
     if (search) where.name = { [Op.iLike]: `%${search}%` };
-
     const listings = await Listing.findAll({ where });
     res.status(200).json({ success: true, data: listings });
   } catch (error) {
-    console.error("getProducts error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// GET active rentals for logged-in renter
 export const getActiveRentals = async (req, res) => {
   try {
     const rentals = await Rental.findAll({
@@ -44,12 +38,10 @@ export const getActiveRentals = async (req, res) => {
     });
     res.status(200).json({ success: true, data: rentals });
   } catch (error) {
-    console.error("getActiveRentals error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// GET rental history for logged-in renter
 export const getRentalHistory = async (req, res) => {
   try {
     const history = await RentalHistory.findAll({
@@ -58,12 +50,10 @@ export const getRentalHistory = async (req, res) => {
     });
     res.status(200).json({ success: true, data: history });
   } catch (error) {
-    console.error("getRentalHistory error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// POST create order (checkout)
 export const createOrder = async (req, res) => {
   try {
     const { items, deliveryInfo } = req.body;
@@ -84,7 +74,14 @@ export const createOrder = async (req, res) => {
         const startStr = start.toISOString().split("T")[0];
         const endStr = end.toISOString().split("T")[0];
 
-        // 1) Save to renter's Rental table
+        // ── Kun seller ko product ho — sellerId fetch garne ──
+        const listing = await Listing.findOne({
+          where: { name: item.productName },
+          attributes: ["userId"],
+        });
+        const sellerId = listing ? listing.userId : null;
+
+        // 1) Renter Rental table
         const rental = await Rental.create({
           userId: req.userId,
           productName: item.productName,
@@ -94,7 +91,7 @@ export const createOrder = async (req, res) => {
           orderStage: 0,
         });
 
-        // 2) Save to renter's RentalHistory table
+        // 2) Renter RentalHistory table
         await RentalHistory.create({
           userId: req.userId,
           productName: item.productName,
@@ -104,8 +101,9 @@ export const createOrder = async (req, res) => {
           date: startStr,
         });
 
-        // 3) Save to seller's Order table ← THIS WAS MISSING
+        // 3) Seller Order table — sellerId SAVE
         await Order.create({
+          sellerId,
           product: item.productName,
           customer: customerName,
           period: item.tenure || "Monthly",
@@ -114,8 +112,9 @@ export const createOrder = async (req, res) => {
           date: today,
         });
 
-        // 4) Save to seller's Customer table ← THIS WAS MISSING
+        // 4) Seller Customer table — sellerId SAVE
         await Customer.create({
+          sellerId,
           name: customerName,
           product: item.productName,
           date: today,

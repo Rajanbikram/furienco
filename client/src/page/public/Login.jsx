@@ -20,8 +20,6 @@ export default function Login() {
       const res = await loginUser({ email: formData.email, password: formData.password });
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.data));
-
-      // Role hेरेर redirect गर्ने
       const role = res.data.data.role;
       if (role === "seller") {
         navigate("/dashboard");
@@ -39,6 +37,20 @@ export default function Login() {
     <div className="auth-wrapper">
       {/* Left Blue Panel */}
       <div className="auth-left">
+        {/* Back to Home button */}
+        <button
+          onClick={() => navigate("/")}
+          style={{
+            position: "absolute", top: 20, left: 20,
+            background: "rgba(255,255,255,0.25)", color: "#fff",
+            border: "1px solid rgba(255,255,255,0.5)", borderRadius: 8,
+            padding: "8px 16px", fontSize: "13px", fontWeight: 600,
+            cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+          }}
+        >
+          ← Back to Home
+        </button>
+
         <div className="auth-logo-box">
           <span className="auth-logo-text">
             Furlenco<span className="auth-logo-icon">⟳</span>
@@ -53,9 +65,7 @@ export default function Login() {
         <div className="auth-form-container">
           <h2 className="auth-title">Welcome Back</h2>
           <p className="auth-subtitle">Sign in to continue</p>
-
           {error && <div className="error-box">{error}</div>}
-
           <form onSubmit={handleSubmit}>
             <div className="form-row">
               <span className="form-label">Email ID</span>
@@ -83,7 +93,6 @@ export default function Login() {
               {loading ? "Logging in..." : "Login"}
             </button>
           </form>
-
           <p className="auth-bottom-text">
             Don't have an account?{" "}
             <span className="auth-link" onClick={() => navigate("/register")}>

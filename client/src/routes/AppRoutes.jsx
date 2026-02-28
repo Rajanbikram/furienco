@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "../page/public/Home";
 import Login from "../page/public/Login";
 import Register from "../page/public/Register";
+import Browse from "../page/public/Browse";
 import Dashboard from "../page/private/seller/Dashboard";
 import AddListing from "../page/private/seller/AddListing";
 import MyListings from "../page/private/seller/MyListings";
@@ -22,6 +23,7 @@ export default function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/browse" element={<Browse />} />  {/* ← NEW */}
 
       {/* Seller Protected Routes */}
       <Route path="/dashboard" element={
